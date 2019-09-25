@@ -56,6 +56,7 @@ namespace Microsoft.Azure.Devices.Edge.Hub.CloudProxy.Authenticators
                 if (isAuthenticated)
                 {
                     await this.credentialsCache.Add(clientCredentials);
+                    Events.TokenUpdated(clientCredentials.Identity);
                 }
             }
 
@@ -86,7 +87,8 @@ namespace Microsoft.Azure.Devices.Edge.Hub.CloudProxy.Authenticators
             {
                 AuthenticatedFromCache = IdStart,
                 AuthenticatedWithCloud,
-                ErrorValidatingCachedToken
+                ErrorValidatingCachedToken,
+                TokenUpdated,
             }
 
             public static void AuthenticatedFromCache(IIdentity identity)
@@ -102,6 +104,11 @@ namespace Microsoft.Azure.Devices.Edge.Hub.CloudProxy.Authenticators
             public static void ErrorValidatingCachedToken(IIdentity identity, Exception exception)
             {
                 Log.LogDebug((int)EventIds.ErrorValidatingCachedToken, $"Error validating cached token for {identity.Id}: {exception.Message}");
+            }
+
+            public static void TokenUpdated(IIdentity identity)
+            {
+                Log.LogInformation((int)EventIds.TokenUpdated, $"Token updated for {identity.Id}");
             }
         }
     }

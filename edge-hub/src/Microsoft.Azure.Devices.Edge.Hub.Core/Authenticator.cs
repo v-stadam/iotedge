@@ -54,6 +54,7 @@ namespace Microsoft.Azure.Devices.Edge.Hub.Core
             if (isAuthenticated)
             {
                 await this.credentialsCache.Add(clientCredentials);
+                Events.TokenUpdated(clientCredentials.Identity);
             }
 
             Events.AuthResult(clientCredentials, reAuthenticating, isAuthenticated);
@@ -68,12 +69,18 @@ namespace Microsoft.Azure.Devices.Edge.Hub.Core
             enum EventIds
             {
                 AuthResult = IdStart,
-                InvalidDeviceError
+                InvalidDeviceError,
+                TokenUpdated
             }
 
             public static void InvalidDeviceId(IModuleIdentity moduleIdentity, string edgeDeviceId)
             {
                 Log.LogError((int)EventIds.InvalidDeviceError, Invariant($"Device Id {moduleIdentity.DeviceId} of module {moduleIdentity.ModuleId} is different from the edge device Id {edgeDeviceId}"));
+            }
+
+            public static void TokenUpdated(IIdentity identity)
+            {
+                Log.LogInformation((int) EventIds.TokenUpdated, $"Token updated for {identity.Id}");
             }
 
             public static void AuthResult(IClientCredentials clientCredentials, bool reAuthenticating, bool result)
